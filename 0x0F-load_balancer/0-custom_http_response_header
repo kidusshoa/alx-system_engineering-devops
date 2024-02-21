@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 # configure web-02 to be identical to web-01
 
-sudo apt-get -y update
+sudo apt-get update
 sudo apt-get -y install nginx
 sudo ufw allow 'Nginx HTTP'
 sudo mkdir -p /var/www/html /var/www/error
 sudo chmod -R 755 /var/www
 echo 'Hello World!' > /var/www/html/index.html
 echo "Ceci n'est pas une page" > /var/www/html/404.html
+
+hostname=$(hostname)
+
+# Configure Nginx to add custom header
+echo "add_header X-Served-By \$hostname;" | sudo tee -a /etc/nginx/sites-available/default
+
 server_config=\
 "server {
 	listen 80 default_server;
