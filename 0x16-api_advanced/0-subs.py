@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 """
 Reddit Subreddit Subscriber Counter
 
@@ -35,23 +36,12 @@ def number_of_subscribers(subreddit):
     Returns:
         int: The total number of subscribers for the subreddit. Returns 0 if the subreddit is invalid.
     """
-    # Form the API request URL for the subreddit's information
-    url = f"https://www.reddit.com/r/{subreddit}/about.json"
-    
-    # Set a custom User-Agent to avoid potential API access issues
-    headers = {"User-Agent": "Custom"}
-    
-    # Make the API request
-    response = requests.get(url, headers=headers)
+    req = requests.get(
+        "https://www.reddit.com/r/{}/about.json".format(subreddit),
+        headers={"User-Agent": "Custom"},
+    )
 
-    # Check if the request was successful (status code 200)
-    if response.status_code == 200:
-        # Extract the subscriber count from the JSON response
-        subscribers_count = response.json().get("data", {}).get("subscribers", 0)
-        return subscribers_count
+    if req.status_code == 200:
+        return req.json().get("data").get("subscribers")
     else:
-        # Invalid subreddit or API request failure, return 0
         return 0
-
-
-
