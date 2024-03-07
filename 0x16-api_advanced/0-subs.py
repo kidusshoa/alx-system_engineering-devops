@@ -11,13 +11,32 @@ def number_of_subscribers(subreddit):
     headers = {"User-Agent": user_agent}
     url = f"https://www.reddit.com/r/{subreddit}/about.json"
 
-    response = requests.get(url, headers=headers)
-
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raise HTTPError for bad responses
         data = response.json()
         subscribers = data["data"]["subscribers"]
         return subscribers
-    elif response.status_code == 404:
-        return 0
+    except requests.exceptions.HTTPError as http_err:
+        if response.status_code == 404:
+            return 0
+        else:
+            print(f"HTTP error occurred: {http_err}")
+    except requests.exceptions.RequestException as req_err:
+        print(f"Request error occurred: {req_err}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+    return 0
+
+
+if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) < 2:
+        print("Please pass an argument for the subreddit to search.")
     else:
-        print(f"Error: {response.status_code}")
+        subreddit = sys.argv[1]
+        subscribers_count = number_of_subscribers(subreddit)
+        print(f"{subscribers_count}")
+
